@@ -1,0 +1,75 @@
+# ensure you've activated enp0s3 which is the default iface name in Virtualbox using nmtui
+# ensure you've mounted the VirtualBox Guest Addition via VirtualBox GUI
+---
+- hosts: target
+  become: true
+  tasks:
+
+  - name: check if you have enough cpu to run minikube
+    shell: lscpu | grep "CPU(s)" | head -1 | awk '{ print $2 }'
+    register: cpu_count
+
+  - block: 
+       - name: "Minimal requirements tests"
+         debug:
+            msg: "Not enough CPU, exiting... CPU count: {{ cpu_count }}"
+       - meta: end_play
+    when: cpu_count|int < 2
+
+  - name: Mount VirtualBox Guest Addition CDROM
+    mount:
+      path: /mnt/
+      src: /dev/cdrom
+      fstype: iso9660
+      opts: ro,noauto
+      state: mounted
+
+  - name: upgrade all packages
+    yum: name=* state=latest
+
+  - name: install epel release
+    yum:
+      name: epel-release
+
+  - name: install package dependecies for VirtualBox Guest Addition
+    yum:
+      name: bzip2, kernel-headers, kernel-devel, gcc, make
+
+  - name: check if vboxguest is loaded
+    shell: lsmod | grep vboxguest | cut -d ' ' -f 1
+    register: lsmod_result
+
+  - name: install VirtualBox Guest Addition
+    shell: ./VBoxLinuxAdditions.run
+    args:
+      chdir: /mnt/
+    when: lsmod_result.stdout != 'vboxguest'
+
+  - name: quick setup for VirtualBox
+    shell: /sbin/rcvboxadd quicksetup all
+    when: lsmod_result.stdout != 'vboxguest'
+
+  - name: remove all build packages for security
+    shell: grep Installed /var/log/yum.log |  cut -d ' ' -f5 | xargs yum -y remove
+
+  - name: install latest Docker from docker.com
+    shell: curl -fsSL https://get.docker.com/ | sh
+
+  - name: install latest minikube 
+    shell: curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64    && sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
+  - name: set minikube vm-driver to none
+    shell: ./minikube config set vm-driver none
+    args:
+       chdir: /usr/local/bin/
+
+  - name: start minikube
+    shell: ./minikube start --vm-driver=none
+    args:
+       chdir: /usr/local/bin/
+ 
+  - name: Unmount VirtualBox Guest Addition CDROM
+    mount:
+      path: /mnt/
+      src: /dev/cdrom
+      state: absent
