@@ -1,4 +1,7 @@
-# awx-virtualbox-build
+# AWX Operator VirtualBox Build
+
+Credits to: Jeff Geerling
+URL: https://www.jeffgeerling.com/blog/2019/run-ansible-tower-or-awx-kubernetes-or-openshift-tower-operator
 
 Pre-requisites:
   OS: Centos 7 VM using VirtualBox
