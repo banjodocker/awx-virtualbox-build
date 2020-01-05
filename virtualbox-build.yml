@@ -5,16 +5,22 @@
   become: true
   tasks:
 
-  - name: check if you have enough cpu to run minikube
+  - name: Get number of CPU's
     shell: lscpu | grep "CPU(s)" | head -1 | awk '{ print $2 }'
     register: cpu_count
+
+  - name: Get number of Total Memory
+    shell: awk '/MemTotal/ {print $2}' /proc/meminfo
+    register: mem_size
 
   - block: 
        - name: "Minimal requirements tests"
          debug:
             msg: "Not enough CPU, exiting... CPU count: {{ cpu_count }}"
        - meta: end_play
-    when: cpu_count|int < 2
+    when: 
+       - cpu_count|int == 1
+       - mem_size < 6144
 
   - name: Mount VirtualBox Guest Addition CDROM
     mount:
@@ -31,9 +37,9 @@
     yum:
       name: epel-release
 
-  - name: install package dependecies for VirtualBox Guest Addition
+  - name: install package dependecies for VirtualBox Guest and AWX build
     yum:
-      name: bzip2, kernel-headers, kernel-devel, gcc, make
+      name: bzip2, kernel-headers, kernel-devel, gcc, make, git, python-pip, ansible, python-devel
 
   - name: check if vboxguest is loaded
     shell: lsmod | grep vboxguest | cut -d ' ' -f 1
@@ -49,25 +55,74 @@
     shell: /sbin/rcvboxadd quicksetup all
     when: lsmod_result.stdout != 'vboxguest'
 
-  - name: remove all build packages for security
-    shell: grep Installed /var/log/yum.log |  cut -d ' ' -f5 | xargs yum -y remove
-
   - name: install latest Docker from docker.com
     shell: curl -fsSL https://get.docker.com/ | sh
 
-  - name: install latest minikube 
-    shell: curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64    && sudo install minikube-linux-amd64 /usr/local/bin/minikube
+  - name: upgrade to the latest pip version
+    pip:
+     name: pip
+     extra_args: --upgrade
 
-  - name: set minikube vm-driver to none
-    shell: ./minikube config set vm-driver none
-    args:
-       chdir: /usr/local/bin/
+  - name: install docker using pip for AWX build
+    pip:
+      name: docker, docker-compose, more-itertools<=5.0.0
 
-  - name: start minikube
-    shell: ./minikube start --vm-driver=none
+  - name: add HTTP in public zone for AWX
+    firewalld:
+      service: http
+      permanent: yes
+      state: enabled
+
+  - name: add HTTPS in public zone for AWX
+    firewalld:
+      service: https
+      permanent: yes
+      state: enabled
+
+  - name: add HTTPS rule in public zone for AWX
+    firewalld:
+      service: https
+      permanent: yes
+      state: enabled
+      zone: public
+      immediate: yes
+
+  - name: add HTTPS rule in public zone for AWX
+    firewalld:
+      service: http
+      permanent: yes
+      state: enabled
+      zone: public
+      immediate: yes
+  
+  - name: Create docker group
+    group:
+      name: docker
+      state: present
+
+  - name: add ansible-security in docker group for AWX install
+    user:
+      name: ansible-security
+      group: docker
+      append: yes
+
+  - name: turn on dockerd
+    systemd:
+      state: started
+      name: docker
+
+  - name: cloneing AWX repo for installation
+    git:
+      repo: https://github.com/ansible/awx
+      dest: ~/awx
+    become: no
+
+  - name: run the install playbook for AWX
+    shell: ansible-playbook -i inventory install.yml
     args:
-       chdir: /usr/local/bin/
- 
+      chdir: /home/ansible-security/awx/installer/
+    become: yes
+
   - name: Unmount VirtualBox Guest Addition CDROM
     mount:
       path: /mnt/
