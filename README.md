@@ -6,11 +6,14 @@ The playbook will build a docker-type AWX from a fresh Centos7 install. I build 
   * Target Host:
       1. OS: Centos 7 VM using VirtualBox
       2. Bridge Adapter
-      3. VirtualBox Guest Addition mounted
+      3. VirtualBox Guest Addition mounted from Device > Insert Guest Additions CD image menu in Virtualbox
       4. 2 CPU
       5. 6 GB Memory
   * Ansible Host:
-      1. Working ansible host
+      1. Working ansible
+      2. Clone this repository
+      3. edit cfg/host 
+      4. change the IP address which is your target host
 
 #### NOTES: If you don't have an ssh key yet in your Ansible hosts run the following and use defaults:
   1. ssh-keygen
