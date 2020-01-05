@@ -1,4 +1,4 @@
-#### AWX Operator VirtualBox Build
+#### AWX installer for Centos 7 from scratch
 
 The playbook will build a docker-type AWX from a fresh Centos7 install. I build this playbook for my team who lacks knowledge on Ansible would appreciate how easy it is to learn Ansible and have a fully working AWX.
 
