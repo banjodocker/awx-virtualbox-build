@@ -1,6 +1,6 @@
-#### AWX installer for Centos 7 from scratch
+#### Install AWX in Centos 7 from scratch the Ansible way
 
-The playbook will build a docker-type AWX from a fresh Centos7 install. I build this playbook for my team who lacks knowledge on Ansible would appreciate how easy it is to learn Ansible and have a fully working AWX.
+The playbook will build a docker-type AWX from a fresh Centos7 install. Installing AWX is straight forward but there are some caveats that I've encountered along the way that this playbook will ensure you don't get any snags. These issues that I've encountered could be daunting for anyone that lacks experience in Linux. So, I made sure that everything will work from start to finish. 
 
 #### Pre-requisites:
   * Target Host:
