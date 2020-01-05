@@ -20,8 +20,10 @@ URL: https://www.jeffgeerling.com/blog/2019/run-ansible-tower-or-awx-kubernetes-
   
 
 ## Target Host Steps:
-Run:
--  useradd ansible-security && usermod -G wheel ansible-security && sudo sed --in-place 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
+Run as root:
+-  useradd ansible-security && usermod -G wheel ansible-security && sed --in-place 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
+
+Run as ansible-security:
 -  mkdir .ssh && echo "YOUR SSH KEY HERE" > .ssh/authorized_keys && chmod 400 .ssh/authorized_keys && chmod 500 .ssh/
 
 
