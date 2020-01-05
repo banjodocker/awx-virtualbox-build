@@ -128,3 +128,8 @@
       path: /mnt/
       src: /dev/cdrom
       state: absent
+
+  - name: Finished
+    debug:
+      msg: "Installation finished! go to http://{{ inventory_hostname }}"
+
