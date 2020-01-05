@@ -8,4 +8,4 @@
 
   - name: Finished
     debug:
-      msg: "Installation finished! go to http://{{ inventory_hostname }}"
+      msg: "Installation finished! go to http://{{ variable1 }}"
