@@ -106,12 +106,13 @@
       group: docker
       append: yes
 
-  - name: turn on dockerd
+  - name: turn on dockerd service and start on boot
     systemd:
       state: started
       name: docker
+      enabled: yes
 
-  - name: cloneing AWX repo for installation
+  - name: clone AWX repo 
     git:
       repo: https://github.com/ansible/awx
       dest: ~/awx
