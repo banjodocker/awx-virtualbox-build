@@ -1,7 +1,7 @@
 # ensure you've activated enp0s3 which is the default iface name in Virtualbox using nmtui
 # ensure you've mounted the VirtualBox Guest Addition via VirtualBox GUI
 ---
-- hosts: target
+- hosts: all
   become: true
 
   tasks:
