@@ -31,7 +31,10 @@
       state: mounted
 
   - name: upgrade all packages
-    yum: name=* state=latest
+    yum: 
+      name=* 
+      state=latest
+      exclude=kernel*
 
   - name: install epel release
     yum:
