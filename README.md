@@ -2,7 +2,7 @@
 
 The playbook will build a docker-type AWX from a fresh Centos7 install. Installing AWX is straight forward but there are some caveats that I've encountered along the way that this playbook will ensure you don't get any snags. These issues that I've encountered could be daunting for anyone that lacks experience in Linux. So, I made sure that everything will work from start to finish. 
 
-The fastest way to get this up and running is using Ansible on cygwin if you are using Windows. Just make sure you've got ``python2 python2-devel python-pip2 git`` packages installed then run ``pip install ansible``
+The fastest way to get this up and running is using Ansible on cygwin if you are using Windows. Just make sure you've got ``python2 python2-devel python27-pip gcc-core libffi-devel libssl1.0-devel git ssh`` packages installed. Then you'll be able to compile ansible in cygwin
 
 #### Pre-requisites:
   * Target Host:
